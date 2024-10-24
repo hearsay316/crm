@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package crm;
+
+import "google/protobuf/timestamp.proto";
+// A snazzy new shirt!
+message User {
+  uint64 id = 1;
+  string name = 2;
+  google.protobuf.Timestamp my_filed = 4;
+}

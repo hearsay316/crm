@@ -1,8 +1,13 @@
-[package]
-name = "crm"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
+members = ["crm"]
+resolver = "2"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+
+[workspace.dependencies]
+anyhow = "1.0.91"
+prost = "0.13.3"
+prost-types = "0.13.3"
+prost-build = "0.13.3"
+
