@@ -1,8 +1,13 @@
-use std::env;
 use anyhow::Result;
+use std::fs;
 
 fn main() -> Result<()> {
-    println!("运行的目录 {:?}", env::current_dir());
-    prost_build::compile_protos(&["../protos/crm.proto"],&["../protos"])?;
+    fs::create_dir_all("./src/pb")?;
+    let builder = tonic_build::configure();
+    //  let mut  builder = Config::new();
+
+    builder
+        .out_dir("./src/pb")
+        .compile_protos(&["../protos/crm.proto"], &["../protos"])?;
     Ok(())
 }

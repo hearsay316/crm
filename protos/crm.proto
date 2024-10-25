@@ -7,5 +7,18 @@ import "google/protobuf/timestamp.proto";
 message User {
   uint64 id = 1;
   string name = 2;
-  google.protobuf.Timestamp my_filed = 4;
+  string email = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+message GetUserRequest{
+  uint64 id = 1;
+}
+
+message CreateUserRequest{
+  string name = 1;
+  string email = 2;
+}
+service UserService{
+  rpc GetUser(GetUserRequest) returns (User) {}
+  rpc CreatrUser(CreateUserRequest) returns (User) {}
 }
