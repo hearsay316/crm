@@ -63,12 +63,10 @@ async fn main() -> anyhow::Result<()> {
 }
 
 fn start(days: u64) -> DateTime<Utc> {
-    DateTime::from(Utc::now())
-        .checked_sub_days(Days::new(days))
-        .unwrap()
+    Utc::now().checked_sub_days(Days::new(days)).unwrap()
 }
 fn end() -> DateTime<Utc> {
-    DateTime::from(Utc::now())
+    Utc::now()
 }
 
 struct IntList(pub i32, pub i32, pub i32); // does not handle locale, see locales module for more
@@ -89,7 +87,7 @@ pub const ALPHABET: [char; 36] = [
 
 struct UniqueEmail;
 impl Dummy<UniqueEmail> for String {
-    fn dummy_with_rng<R: Rng + ?Sized>(v: &UniqueEmail, rng: &mut R) -> String {
+    fn dummy_with_rng<R: Rng + ?Sized>(_v: &UniqueEmail, rng: &mut R) -> String {
         let email: String = SafeEmail().fake_with_rng(rng);
         let id = format!(".{}", nanoid!(8, &ALPHABET));
         let at = email.find("@").unwrap();
