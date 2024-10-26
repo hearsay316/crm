@@ -26,7 +26,7 @@ impl UserService for UserServer {
 // include!(concat!(env!("OUT_DIR"), "/crm.rs"));
 #[tokio::main]
 async fn main() -> Result<()> {
-    let addr = "[::1]:50051".parse().unwrap();
+    let addr = "[::1]:50051".parse()?;
     let svc = UserServer;
     println!("UserServiceServer  listening on {}", addr);
     Server::builder()
