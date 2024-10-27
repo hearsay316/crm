@@ -23,13 +23,21 @@ use fake::{
 use nanoid::nanoid;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+use sqlx::{Executor, PgPool};
 
+#[derive(Debug, Clone, Dummy, Serialize, Deserialize, Eq, PartialEq)]
+enum Gender {
+    Female,
+    Male,
+    Unknown,
+}
 #[derive(Debug, Dummy, Serialize, Deserialize, PartialEq, Eq)]
-struct UserState {
+struct UserStat {
     #[dummy(faker = "UniqueEmail")]
     email: String,
     #[dummy(faker = "Name()")]
     name: String,
+    gender: Gender,
     #[dummy(faker = "DateTimeBetween(start(365*3), end())")]
     created_at: DateTime<Utc>,
     #[dummy(faker = "DateTimeBetween(start(30), end())")]
@@ -57,8 +65,35 @@ struct UserState {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // DateTimeBefore()
-    let user: UserState = Faker.fake();
+    let user: UserStat = Faker.fake();
     println!("{:?}", user);
+    Ok(())
+}
+async fn bulk_insert(users: Vec<UserStat>, pool: &PgPool) -> anyhow::Result<()> {
+    let mut tx = pool.begin().await?;
+    for user in users {
+        let query =    sqlx::query(
+            r#"
+            INSERT INTO user_stats(email, name, created_at, last_visited_at, last_watched_at, recent_watched, viewed_but_not_started, started_but_not_finished, finished, last_email_notification, last_in_app_notification, last_sms_notification)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+
+            "#
+        )
+            .bind(user.email)
+            .bind(user.name)
+            .bind(user.created_at)
+            .bind(user.last_visited_at)
+            .bind(user.last_watched_at)
+            .bind(user.recent_watched)
+            .bind(user.viewed_but_not_started)
+            .bind(user.started_but_not_finished)
+            .bind(user.finished)
+            .bind(user.last_email_notification)
+            .bind(user.last_in_app_notification)
+            .bind(user.last_sms_notification);
+        tx.execute(query).await?;
+    }
+    tx.commit().await?;
     Ok(())
 }
 
@@ -92,7 +127,6 @@ impl Dummy<UniqueEmail> for String {
         let id = format!(".{}", nanoid!(8, &ALPHABET));
         let at = email.find("@").unwrap();
         let email = format!("{}{}{}", &email[..at], id, &email[at..]);
-
         email
     }
 }
