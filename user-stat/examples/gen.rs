@@ -24,13 +24,31 @@ use nanoid::nanoid;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use sqlx::{Executor, PgPool};
+use std::collections::HashSet;
+use std::fmt::Debug;
+use std::hash::{Hash, Hasher};
+use tokio::time::Instant;
 
-#[derive(Debug, Clone, Dummy, Serialize, Deserialize, Eq, PartialEq)]
+#[derive(Clone, Dummy, Serialize, Deserialize, Eq, PartialEq)]
 enum Gender {
     Female,
     Male,
     Unknown,
 }
+impl Debug for Gender {
+    #[inline]
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        ::core::fmt::Formatter::write_str(
+            f,
+            match self {
+                Gender::Female => "female",
+                Gender::Male => "male",
+                Gender::Unknown => "unknown",
+            },
+        )
+    }
+}
+
 #[derive(Debug, Dummy, Serialize, Deserialize, PartialEq, Eq)]
 struct UserStat {
     #[dummy(faker = "UniqueEmail")]
@@ -64,33 +82,81 @@ struct UserStat {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    let pool = PgPool::connect("postgres://postgres:123321@localhost:5432/stats")
+        .await
+        .expect("这份是错误");
     // DateTimeBefore()
     let user: UserStat = Faker.fake();
+    for i in 1..=500 {
+        let users: HashSet<_> = (0..10000).map(|_| Faker.fake::<UserStat>()).collect();
+        let start = Instant::now();
+        raw_insert(users, &pool).await?;
+        println!("正在插入数据,  当前进度 {}", i);
+        println!("耗时: {:?}", start.elapsed());
+    }
     println!("{:?}", user);
     Ok(())
 }
-async fn bulk_insert(users: Vec<UserStat>, pool: &PgPool) -> anyhow::Result<()> {
+
+async fn raw_insert(users: HashSet<UserStat>, pool: &PgPool) -> anyhow::Result<()> {
+    let mut sql = String::with_capacity(10 * 1000 * 1000);
+    sql.push_str(
+        "INSERT INTO user_stats(email, name, gender, created_at, last_visited_at,
+            last_watched_at, recent_watched, viewed_but_not_started,
+            started_but_not_finished, finished, last_email_notification,
+            last_in_app_notification, last_sms_notification) VALUES",
+    );
+    for user in users {
+        sql.push_str(&format!(
+            "('{}', '{}','{:?}', '{}', '{}', '{}', {}::int[], {}::int[], {}::int[], {}::int[], '{}', '{}', '{}'),",
+            user.email,
+            user.name,
+            user.gender,
+            user.created_at,
+            user.last_visited_at,
+            user.last_watched_at,
+            list_to_string(user.recent_watched),
+            list_to_string(user.viewed_but_not_started),
+            list_to_string(user.started_but_not_finished),
+            list_to_string(user.finished),
+            user.last_email_notification,
+            user.last_in_app_notification,
+            user.last_sms_notification,
+        ));
+    }
+    let v = &sql[..sql.len() - 1];
+    sqlx::query(v).execute(pool).await?;
+    Ok(())
+}
+fn list_to_string(list: Vec<i32>) -> String {
+    format!("ARRAY{:?}", list)
+}
+#[allow(dead_code)]
+async fn bulk_insert(users: HashSet<UserStat>, pool: &PgPool) -> anyhow::Result<()> {
     let mut tx = pool.begin().await?;
     for user in users {
-        let query =    sqlx::query(
+        let query = sqlx::query(
             r#"
-            INSERT INTO user_stats(email, name, created_at, last_visited_at, last_watched_at, recent_watched, viewed_but_not_started, started_but_not_finished, finished, last_email_notification, last_in_app_notification, last_sms_notification)
+            INSERT INTO user_stats
+            (email, name, created_at, last_visited_at,
+            last_watched_at, recent_watched, viewed_but_not_started,
+            started_but_not_finished, finished, last_email_notification,
+            last_in_app_notification, last_sms_notification)
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-
-            "#
+            "#,
         )
-            .bind(user.email)
-            .bind(user.name)
-            .bind(user.created_at)
-            .bind(user.last_visited_at)
-            .bind(user.last_watched_at)
-            .bind(user.recent_watched)
-            .bind(user.viewed_but_not_started)
-            .bind(user.started_but_not_finished)
-            .bind(user.finished)
-            .bind(user.last_email_notification)
-            .bind(user.last_in_app_notification)
-            .bind(user.last_sms_notification);
+        .bind(user.email)
+        .bind(user.name)
+        .bind(user.created_at)
+        .bind(user.last_visited_at)
+        .bind(user.last_watched_at)
+        .bind(user.recent_watched)
+        .bind(user.viewed_but_not_started)
+        .bind(user.started_but_not_finished)
+        .bind(user.finished)
+        .bind(user.last_email_notification)
+        .bind(user.last_in_app_notification)
+        .bind(user.last_sms_notification);
         tx.execute(query).await?;
     }
     tx.commit().await?;
@@ -102,6 +168,12 @@ fn start(days: u64) -> DateTime<Utc> {
 }
 fn end() -> DateTime<Utc> {
     Utc::now()
+}
+
+impl Hash for UserStat {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.email.hash(state)
+    }
 }
 
 struct IntList(pub i32, pub i32, pub i32); // does not handle locale, see locales module for more
