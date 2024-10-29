@@ -56,11 +56,11 @@ struct UserStat {
     #[dummy(faker = "Name()")]
     name: String,
     gender: Gender,
-    #[dummy(faker = "DateTimeBetween(start(365*3), end())")]
+    #[dummy(faker = "DateTimeBetween(before(365*3), before(90))")]
     created_at: DateTime<Utc>,
-    #[dummy(faker = "DateTimeBetween(start(30), end())")]
+    #[dummy(faker = "DateTimeBetween(before(30), now())")]
     last_visited_at: DateTime<Utc>,
-    #[dummy(faker = "DateTimeBetween(start(90), end())")]
+    #[dummy(faker = "DateTimeBetween(before(90), now())")]
     last_watched_at: DateTime<Utc>,
     #[dummy(faker = "IntList(50,10000,10000)")]
     recent_watched: Vec<i32>,
@@ -70,11 +70,11 @@ struct UserStat {
     started_but_not_finished: Vec<i32>,
     #[dummy(faker = "IntList(50,40000,10000)")]
     finished: Vec<i32>,
-    #[dummy(faker = "DateTimeBetween(start(45), end())")]
+    #[dummy(faker = "DateTimeBetween(before(45), now())")]
     last_email_notification: DateTime<Utc>,
-    #[dummy(faker = "DateTimeBetween(start(15), end())")]
+    #[dummy(faker = "DateTimeBetween(before(15), now())")]
     last_in_app_notification: DateTime<Utc>,
-    #[dummy(faker = "DateTimeBetween(start(90), end())")]
+    #[dummy(faker = "DateTimeBetween(before(90), now())")]
     last_sms_notification: DateTime<Utc>,
 }
 
@@ -163,10 +163,10 @@ async fn bulk_insert(users: HashSet<UserStat>, pool: &PgPool) -> anyhow::Result<
     Ok(())
 }
 
-fn start(days: u64) -> DateTime<Utc> {
+fn before(days: u64) -> DateTime<Utc> {
     Utc::now().checked_sub_days(Days::new(days)).unwrap()
 }
-fn end() -> DateTime<Utc> {
+fn now() -> DateTime<Utc> {
     Utc::now()
 }
 
