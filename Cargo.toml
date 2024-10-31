@@ -16,3 +16,4 @@ tonic-build = "0.12.3"
 sqlx = { version = "0.8.2", features = ["postgres", "runtime-tokio", "tls-rustls", "chrono"] }
 serde = { version = "1.0.213", features = ["derive"] }
 chrono = { version = "0.4.38", features = ["serde"] }
+proto-builder-trait = "0.6.2"

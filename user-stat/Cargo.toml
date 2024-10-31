@@ -17,3 +17,8 @@ rand = "0.8.5"
 [dev-dependencies]
 fake = { version = "2.10.0", features = ["derive", "chrono"] }
 nanoid = "0.4.0"
+[build-dependencies]
+anyhow = { workspace = true }
+tonic-build = {workspace = true}
+prost-build = {workspace = true}
+proto-builder-trait ={workspace = true}

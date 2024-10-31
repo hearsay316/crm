@@ -1293,6 +1293,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "proto-builder-trait"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d775e60044f85140a692ecd2ed991bba224f55a4196169a339fdd773207a25c"
+dependencies = [
+ "prost-build",
+ "tonic-build",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2153,12 +2163,15 @@ dependencies = [
  "fake",
  "nanoid",
  "prost",
+ "prost-build",
  "prost-types",
+ "proto-builder-trait",
  "rand",
  "serde",
  "sqlx",
  "tokio",
  "tonic",
+ "tonic-build",
 ]
 
 [[package]]

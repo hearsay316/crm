@@ -13,7 +13,7 @@ impl UserService for UserServer {
         Ok(Response::new(User::default()))
     }
 
-    async fn creatr_user(
+    async fn create_user(
         &self,
         request: Request<CreateUserRequest>,
     ) -> Result<Response<User>, Status> {

@@ -8,6 +8,6 @@ fn main() -> Result<()> {
 
     builder
         .out_dir("./src/pb")
-        .compile_protos(&["../protos/crm.proto"], &["../protos"])?;
+        .compile_protos(&["../protos/crm/crm.proto"], &["../protos/crm"])?;
     Ok(())
 }

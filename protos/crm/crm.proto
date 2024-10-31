@@ -20,5 +20,5 @@ message CreateUserRequest{
 }
 service UserService{
   rpc GetUser(GetUserRequest) returns (User) {}
-  rpc CreatrUser(CreateUserRequest) returns (User) {}
+  rpc CreateUser(CreateUserRequest) returns (User) {}
 }
