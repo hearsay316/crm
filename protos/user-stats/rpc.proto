@@ -6,5 +6,5 @@ import "google/protobuf/timestamp.proto";
 import "message.proto";
 service UserStats{
   rpc Query(QueryRequest) returns (stream User) {}
-  rpc CreateUser(RawQueryRequest) returns (stream User) {}
+  rpc RawQuery(RawQueryRequest) returns (stream User) {}
 }
