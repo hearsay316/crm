@@ -1,24 +1,35 @@
-use std::pin::Pin;
 use futures::Stream;
-use user_stat::pb::{QueryRequest, RawQueryRequest, UserBuilder};
-use user_stat::pb::{user_stats_server::{UserStats, UserStatsServer as UserStatsServers}, User};
+use std::pin::Pin;
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
-type ServiceResult<T> = Result<Response<T>,Status>;
-type ResponseStream = Pin<Box<dyn Stream<Item = Result<User,Status>> + Send>>;
+use user_stat::pb::{
+    user_stats_server::{UserStats, UserStatsServer as UserStatsServers},
+    User,
+};
+#[allow(unused_imports)]
+use user_stat::pb::{QueryRequest, RawQueryRequest, UserBuilder};
+#[allow(dead_code)]
+type ServiceResult<T> = Result<Response<T>, Status>;
+type ResponseStream = Pin<Box<dyn Stream<Item = Result<User, Status>> + Send>>;
 #[derive(Debug, Default)]
 pub struct UserStatsServer {}
 #[tonic::async_trait]
 impl UserStats for UserStatsServer {
     type QueryStream = ResponseStream;
-
-    async fn query(&self, request: Request<QueryRequest>) -> Result<Response<Self::QueryStream>, Status> {
+    #[allow(unused_variables)]
+    async fn query(
+        &self,
+        request: Request<QueryRequest>,
+    ) -> Result<Response<Self::QueryStream>, Status> {
         todo!()
     }
 
     type RawQueryStream = ResponseStream;
-
-    async fn raw_query(&self, request: Request<RawQueryRequest>) -> Result<Response<Self::RawQueryStream>, Status> {
+    #[allow(unused_variables)]
+    async fn raw_query(
+        &self,
+        request: Request<RawQueryRequest>,
+    ) -> Result<Response<Self::RawQueryStream>, Status> {
         todo!()
     }
 }

@@ -10,6 +10,6 @@ async fn main() -> anyhow::Result<()> {
     });
     let response = client.create_user(request).await?;
     println!("response :{:?}", response);
-    
+
     Ok(())
 }

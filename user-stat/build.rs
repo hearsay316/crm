@@ -1,10 +1,10 @@
 use anyhow::Result;
-use std::fs;
 use proto_builder_trait::tonic::BuilderAttributes;
+use std::fs;
 
 fn main() -> Result<()> {
     fs::create_dir_all("./src/pb")?;
-     let builder = tonic_build::configure();
+    let builder = tonic_build::configure();
     builder
         .out_dir("./src/pb")
         .with_serde(
@@ -27,15 +27,24 @@ fn main() -> Result<()> {
             None,
         )
         .with_field_attributes(
-            &["User.email","User.name", "RawQueryRequest,query"],
+            &["User.email", "User.name", "RawQueryRequest,query"],
             &[r#"
         #[builder(setter(into))]
         "#],
         )
-        .with_field_attributes(&["TimeQuery.before", "TimeQuery,after"],&[r#"
+        .with_field_attributes(
+            &["TimeQuery.before", "TimeQuery,after"],
+            &[r#"
         #[builder(setter(into,strip_option))]
-        "#])
-        .compile_protos(&["../protos/user-stats/message.proto",  "../protos/user-stats/rpc.proto",], &["../protos/user-stats"])?;
+        "#],
+        )
+        .compile_protos(
+            &[
+                "../protos/user-stats/message.proto",
+                "../protos/user-stats/rpc.proto",
+            ],
+            &["../protos/user-stats"],
+        )?;
 
     Ok(())
 }
