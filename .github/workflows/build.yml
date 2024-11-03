@@ -38,7 +38,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Install Protoc
-      - uses: arduino/setup-protoc@v3
+        uses: arduino/setup-protoc@v3
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
