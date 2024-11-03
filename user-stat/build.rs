@@ -35,9 +35,15 @@ fn main() -> Result<()> {
         .with_field_attributes(
             &["TimeQuery.before", "TimeQuery,after"],
             &[r#"
-        #[builder(setter(into,strip_option))]
+        #[builder(setter(into,strip_option) )]
         "#],
         )
+        .with_field_attributes(&["QueryRequest.timestamps"],&[r#"
+        #[builder(setter(each(name="timestamp",into)))]
+        "#])
+        .with_field_attributes(&["QueryRequest.ids"],&[r#"
+        #[builder(setter(each(name="id",into)))]
+        "#])
         .compile_protos(
             &[
                 "../protos/user-stats/message.proto",
