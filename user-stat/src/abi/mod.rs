@@ -30,13 +30,14 @@ impl UserStatsService {
             .fetch_all(&self.pool)
             .await
         else {
-            return 
-                Err(tonic::Status::internal(format!(
-                    "Failed to fetch data :{:?}",
-                    req.query
-                )));
+            return Err(tonic::Status::internal(format!(
+                "Failed to fetch data :{:?}",
+                req.query
+            )));
         };
-        Ok(Response::new(Box::pin(futures::stream::iter(ret.into_iter().map(Ok)))))
+        Ok(Response::new(Box::pin(futures::stream::iter(
+            ret.into_iter().map(Ok),
+        ))))
     }
 }
 fn timestamp_query(name: &str, lower: Option<Timestamp>, upper: Option<Timestamp>) -> String {
@@ -77,19 +78,22 @@ fn ts_to_utc(ts: Timestamp) -> DateTime<Utc> {
 mod test {
     use super::*;
     use crate::pb::{IdQuery, QueryRequestBuilder, TimeQuery};
+    use crate::AppConfig;
     use anyhow::Result;
     use futures::StreamExt;
     use tracing::info;
 
     #[tokio::test]
     async fn raw_query_should_work() -> Result<()> {
-        let svc = UserStatsService::new().await;
+        let config = AppConfig::load()?;
+        let svc = UserStatsService::new(config).await;
         let mut stream = svc
             .raw_query(RawQueryRequest {
                 query: "SELECT email ,name FROM user_stats where created_at > '2024-01-01' limit 5"
                     .to_string(),
             })
-            .await?.into_inner();
+            .await?
+            .into_inner();
         // futures::stream::iter(stream).then(|item| async move{
         //     println!("{:?}",item);
         //     Ok(item)
@@ -104,7 +108,8 @@ mod test {
     }
     #[tokio::test]
     async fn query_should_work() -> Result<()> {
-        let svc = UserStatsService::new().await;
+        let config = AppConfig::load()?;
+        let svc = UserStatsService::new(config).await;
         let query = QueryRequestBuilder::default()
             .timestamp(("created_at".to_string(), tq(Some(120), None)))
             .timestamp(("last_visited_at".to_string(), tq(Some(45), None)))

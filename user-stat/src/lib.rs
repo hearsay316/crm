@@ -9,7 +9,7 @@ use crate::pb::{
     QueryRequest, RawQueryRequest, User,
 };
 pub use config::*;
-use futures::{Stream};
+use futures::Stream;
 use sqlx::PgPool;
 use std::ops::Deref;
 use std::pin::Pin;
@@ -55,8 +55,8 @@ impl From<UserStatsService> for UserStatsServer<UserStatsService> {
     }
 }
 impl UserStatsService {
-    pub async fn new() -> Self {
-        let config = AppConfig::load().unwrap();
+    pub async fn new(config: AppConfig) -> Self {
+        // let config = AppConfig::load().unwrap();
         let db = PgPool::connect(&config.server.db_url)
             .await
             .expect("Failed to connect to db");
