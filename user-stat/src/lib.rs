@@ -1,8 +1,7 @@
+mod abi;
 mod config;
 pub mod pb;
-mod abi;
 
-use std::ops::Deref;
 #[allow(unused_imports)]
 use crate::pb::UserBuilder;
 use crate::pb::{
@@ -12,6 +11,7 @@ use crate::pb::{
 pub use config::*;
 use futures::Stream;
 use sqlx::PgPool;
+use std::ops::Deref;
 use std::pin::Pin;
 use std::sync::Arc;
 use tonic::{Request, Response, Status};
@@ -19,12 +19,12 @@ use tonic::{Request, Response, Status};
 #[allow(dead_code)]
 type ServiceResult<T> = Result<Response<T>, Status>;
 type ResponseStream = Pin<Box<dyn Stream<Item = Result<User, Status>> + Send>>;
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct UserStatsService {
     inner: Arc<UserStatsServiceInner>,
 }
 #[allow(unused)]
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct UserStatsServiceInner {
     config: AppConfig,
     pool: PgPool,
@@ -55,18 +55,17 @@ impl From<UserStatsService> for UserStatsServer<UserStatsService> {
         UserStatsServer::new(value)
     }
 }
-impl UserStatsService{
-   pub async fn new() ->Self{
-       let config = AppConfig::load().unwrap();
-       let db = PgPool::connect(&config.server.db_url).await.expect("Failed to connect to db");
-       UserStatsService{
-           inner: Arc::new(UserStatsServiceInner{
-               config,
-               pool:db,
-           })
-       }
-   }
-   pub fn into_server(self) -> UserStatsServer<UserStatsService> {
+impl UserStatsService {
+    pub async fn new() -> Self {
+        let config = AppConfig::load().unwrap();
+        let db = PgPool::connect(&config.server.db_url)
+            .await
+            .expect("Failed to connect to db");
+        UserStatsService {
+            inner: Arc::new(UserStatsServiceInner { config, pool: db }),
+        }
+    }
+    pub fn into_server(self) -> UserStatsServer<UserStatsService> {
         UserStatsServer::new(self)
     }
 }

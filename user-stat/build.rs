@@ -38,12 +38,18 @@ fn main() -> Result<()> {
         #[builder(setter(into,strip_option) )]
         "#],
         )
-        .with_field_attributes(&["QueryRequest.timestamps"],&[r#"
+        .with_field_attributes(
+            &["QueryRequest.timestamps"],
+            &[r#"
         #[builder(setter(each(name="timestamp",into)))]
-        "#])
-        .with_field_attributes(&["QueryRequest.ids"],&[r#"
+        "#],
+        )
+        .with_field_attributes(
+            &["QueryRequest.ids"],
+            &[r#"
         #[builder(setter(each(name="id",into)))]
-        "#])
+        "#],
+        )
         .compile_protos(
             &[
                 "../protos/user-stats/message.proto",

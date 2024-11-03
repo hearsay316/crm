@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs::File;
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub server: ServerConfig,

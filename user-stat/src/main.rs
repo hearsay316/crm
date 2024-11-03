@@ -6,11 +6,8 @@ use user_stat::UserStatsService;
 async fn main() -> anyhow::Result<()> {
     println!("Hello, world!");
     let addr = "[::1]:50051".parse()?;
-    let svc =UserStatsService::new().await.into_server();
+    let svc = UserStatsService::new().await.into_server();
     println!("UserServiceServer  listening on {}", addr);
-    Server::builder()
-        .add_service(svc)
-        .serve(addr)
-        .await?;
+    Server::builder().add_service(svc).serve(addr).await?;
     Ok(())
 }

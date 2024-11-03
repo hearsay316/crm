@@ -21,6 +21,7 @@ impl UserStatsService {
             .join(" AND ");
         sql.push_str(" AND ");
         sql.push_str(&ids_conditions);
+        println!("Generated SQL: {}", sql);
         self.raw_query(RawQueryRequest { query: sql }).await
     }
     pub async fn raw_query(&self, req: RawQueryRequest) -> ResponseStream {
@@ -46,7 +47,7 @@ fn timestamp_query(name: &str, lower: Option<Timestamp>, upper: Option<Timestamp
         let upper = upper.unwrap();
         let upper = ts_to_utc(upper);
 
-        return format!("{} <='{}'", name, upper.to_rfc3339());
+        return format!("{} <= '{}'", name, upper.to_rfc3339());
     }
     if upper.is_none() {
         let lower = lower.unwrap();
@@ -77,9 +78,7 @@ mod test {
     use super::*;
     use crate::pb::{IdQuery, QueryRequestBuilder, TimeQuery};
     use anyhow::Result;
-    use prost_types::Timestamp;
-    use tonic::codegen::tokio_stream::StreamExt;
-
+    use futures::StreamExt;
     #[tokio::test]
     async fn raw_query_should_work() -> Result<()> {
         let svc = UserStatsService::new().await;
@@ -106,13 +105,10 @@ mod test {
         let svc = UserStatsService::new().await;
         let query = QueryRequestBuilder::default()
             .timestamp(("created_at".to_string(), tq(Some(120), None)))
-            .timestamp(("last_visited_at".to_string(), tq(Some(15), Some(30))))
-            .id((
-                "viewed_but_not_started".to_string(),
-                id(&[29789]),
-            ))
+            .timestamp(("last_visited_at".to_string(), tq(Some(45), None)))
+            .id(("viewed_but_not_started".to_string(), id(&[29789])))
             .build()?;
-        println!("{:?}",query);
+        println!("{:?}", query);
         let mut stream = svc.query(query).await;
         while let Some(res) = stream.next().await {
             println!("{:?}", res);
@@ -130,9 +126,8 @@ mod test {
     }
     fn to_ts(days: i64) -> Timestamp {
         let dt = Utc::now()
-            .checked_add_signed(chrono::Duration::days(days))
+            .checked_sub_signed(chrono::Duration::days(days))
             .unwrap();
-
         Timestamp {
             seconds: dt.timestamp(),
             nanos: dt.timestamp_subsec_nanos() as i32,
