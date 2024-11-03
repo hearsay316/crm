@@ -1,11 +1,12 @@
 use crate::pb::{QueryRequest, RawQueryRequest, User};
-use crate::{ResponseStream, UserStatsService};
+use crate::{ResponseStream, ServiceResult, UserStatsService};
 use chrono::{DateTime, TimeZone, Utc};
 use itertools::Itertools;
 use prost_types::Timestamp;
+use tonic::Response;
 
 impl UserStatsService {
-    pub async fn query(&self, query: QueryRequest) -> ResponseStream {
+    pub async fn query(&self, query: QueryRequest) -> ServiceResult<ResponseStream> {
         let mut sql = "SELECT email ,name FROM user_stats WHERE ".to_string();
         let time_conditions = query
             .timestamps
@@ -24,19 +25,18 @@ impl UserStatsService {
         println!("Generated SQL: {}", sql);
         self.raw_query(RawQueryRequest { query: sql }).await
     }
-    pub async fn raw_query(&self, req: RawQueryRequest) -> ResponseStream {
+    pub async fn raw_query(&self, req: RawQueryRequest) -> ServiceResult<ResponseStream> {
         let Ok(ret) = sqlx::query_as::<_, User>(&req.query)
             .fetch_all(&self.pool)
             .await
         else {
-            return Box::pin(futures::stream::once(async move {
+            return 
                 Err(tonic::Status::internal(format!(
                     "Failed to fetch data :{:?}",
                     req.query
-                )))
-            }));
+                )));
         };
-        Box::pin(futures::stream::iter(ret.into_iter().map(Ok)))
+        Ok(Response::new(Box::pin(futures::stream::iter(ret.into_iter().map(Ok)))))
     }
 }
 fn timestamp_query(name: &str, lower: Option<Timestamp>, upper: Option<Timestamp>) -> String {
@@ -79,6 +79,8 @@ mod test {
     use crate::pb::{IdQuery, QueryRequestBuilder, TimeQuery};
     use anyhow::Result;
     use futures::StreamExt;
+    use tracing::info;
+
     #[tokio::test]
     async fn raw_query_should_work() -> Result<()> {
         let svc = UserStatsService::new().await;
@@ -87,7 +89,7 @@ mod test {
                 query: "SELECT email ,name FROM user_stats where created_at > '2024-01-01' limit 5"
                     .to_string(),
             })
-            .await;
+            .await?.into_inner();
         // futures::stream::iter(stream).then(|item| async move{
         //     println!("{:?}",item);
         //     Ok(item)
@@ -108,8 +110,8 @@ mod test {
             .timestamp(("last_visited_at".to_string(), tq(Some(45), None)))
             .id(("viewed_but_not_started".to_string(), id(&[29789])))
             .build()?;
-        println!("{:?}", query);
-        let mut stream = svc.query(query).await;
+        info!("{:?}", query);
+        let mut stream = svc.query(query).await?.into_inner();
         while let Some(res) = stream.next().await {
             println!("{:?}", res);
         }

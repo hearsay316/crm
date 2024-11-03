@@ -9,7 +9,7 @@ use crate::pb::{
     QueryRequest, RawQueryRequest, User,
 };
 pub use config::*;
-use futures::Stream;
+use futures::{Stream};
 use sqlx::PgPool;
 use std::ops::Deref;
 use std::pin::Pin;
@@ -33,11 +33,9 @@ pub struct UserStatsServiceInner {
 impl UserStats for UserStatsService {
     type QueryStream = ResponseStream;
     #[allow(unused_variables)]
-    async fn query(
-        &self,
-        request: Request<QueryRequest>,
-    ) -> Result<Response<Self::QueryStream>, Status> {
-        todo!()
+    async fn query(&self, request: Request<QueryRequest>) -> ServiceResult<Self::QueryStream> {
+        let query = request.into_inner();
+        self.query(query).await
     }
 
     type RawQueryStream = ResponseStream;
@@ -45,8 +43,9 @@ impl UserStats for UserStatsService {
     async fn raw_query(
         &self,
         request: Request<RawQueryRequest>,
-    ) -> Result<Response<Self::RawQueryStream>, Status> {
-        todo!()
+    ) -> ServiceResult<Self::RawQueryStream> {
+        let query = request.into_inner();
+        self.raw_query(query).await
     }
 }
 
