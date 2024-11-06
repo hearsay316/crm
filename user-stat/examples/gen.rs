@@ -202,3 +202,25 @@ impl Dummy<UniqueEmail> for String {
         email
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[tokio::test]
+    async fn test_list_to_string() -> anyhow::Result<()> {
+        let pool = PgPool::connect("postgres://postgres:123321@localhost:5432/stats")
+            .await
+            .expect("这份是错误");
+        // DateTimeBefore()
+        let user: UserStat = Faker.fake();
+
+        let users: HashSet<_> = (0..10000).map(|_| Faker.fake::<UserStat>()).collect();
+        let start = Instant::now();
+        raw_insert(users, &pool).await?;
+        println!("耗时: {:?}", start.elapsed());
+
+        println!("{:?}", user);
+
+        Ok(())
+    }
+}
