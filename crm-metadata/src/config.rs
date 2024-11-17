@@ -18,7 +18,6 @@ pub struct AppConfig {
 pub struct ServerConfig {
     // pub host: String,
     pub port: u16,
-    pub db_url: String,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AuthConfig {
@@ -31,8 +30,8 @@ impl AppConfig {
         // 或者是 env
         let ret = match (
             File::open("metadata.yml"),
-            File::open("/ect/config/notify.yml"),
-            env::var("NOTIFY_CONFIG"),
+            File::open("/ect/config/metadata.yml"),
+            env::var("METADATA_CONFIG"),
         ) {
             (Ok(reader), _, _) => serde_yaml::from_reader(reader),
             (_, Ok(reader), _) => serde_yaml::from_reader(reader),
