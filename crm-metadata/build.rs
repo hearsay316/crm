@@ -8,47 +8,12 @@ fn main() -> Result<()> {
     builder
         .out_dir("./src/pb")
         .with_serde(
-            &["User"],
+            &["Content","ContentType","Publisher","Timestamp"],
             true,
             true,
             Some(&[r#"
         #[serde(rename_all = "camelCase")]
         "#]),
-        )
-        .with_sqlx_from_row(&["User"], None)
-        .with_derive_builder(
-            &[
-                "User",
-                "QueryRequest",
-                "RawQueryResult",
-                "TimeQuery",
-                "IdQuery",
-            ],
-            None,
-        )
-        .with_field_attributes(
-            &["User.email", "User.name", "RawQueryRequest,query"],
-            &[r#"
-        #[builder(setter(into))]
-        "#],
-        )
-        .with_field_attributes(
-            &["TimeQuery.before", "TimeQuery,after"],
-            &[r#"
-        #[builder(setter(into,strip_option) )]
-        "#],
-        )
-        .with_field_attributes(
-            &["QueryRequest.timestamps"],
-            &[r#"
-        #[builder(setter(each(name="timestamp",into)))]
-        "#],
-        )
-        .with_field_attributes(
-            &["QueryRequest.ids"],
-            &[r#"
-        #[builder(setter(each(name="id",into)))]
-        "#],
         )
         .compile_protos(
             &[

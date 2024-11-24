@@ -1,2 +1,2 @@
-mod metadata;
-pub use metadata::*;
+mod notification;
+pub use notification::*;

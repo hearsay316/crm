@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package notification;
+
+import "google/protobuf/timestamp.proto";
+import "mess.proto";
+service notification{
+  rpc Send(stream SendRequest) returns (stream SendResponse) {}
+
+}
