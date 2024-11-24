@@ -19,7 +19,7 @@ message Content{
   string image = 6;
   ContentType type = 7;
   google.protobuf.Timestamp last_visited_at = 8;
-  uint64  view = 9;
+  uint64  views = 9;
   uint64 likes = 10;
   uint64 dislikes = 11;
 }
