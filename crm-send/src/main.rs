@@ -1,5 +1,5 @@
-use crm_send::config::AppConfig;
 use crm_metadata::MetaDataService;
+use crm_send::config::AppConfig;
 use tonic::transport::Server;
 use tracing::info;
 use tracing::level_filters::LevelFilter;
@@ -7,7 +7,6 @@ use tracing_subscriber::fmt::Layer;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::Layer as _;
-
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

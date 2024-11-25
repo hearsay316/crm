@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     builder
         .out_dir("./src/pb")
         .with_serde(
-            &["Content","ContentType","Publisher","Timestamp"],
+            &["Content", "ContentType", "Publisher", "Timestamp"],
             true,
             true,
             Some(&[r#"
