@@ -19,7 +19,7 @@ serde_yaml = {workspace = true}
 itertools = "0.13.0"
 tracing = {workspace = true}
 tracing-subscriber = { workspace = true }
-tokio-stream = "0.1.16"
+tokio-stream = {workspace = true}
 [dev-dependencies]
 
 fake = { workspace = true }

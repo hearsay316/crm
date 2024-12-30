@@ -2,51 +2,57 @@
 /// email message to be send
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EmailMessage {
-    /// subject of the email
+    /// unique id of the message
     #[prost(string, tag = "1")]
+    pub message_id: ::prost::alloc::string::String,
+    /// subject of the email
+    #[prost(string, tag = "2")]
     pub subject: ::prost::alloc::string::String,
     /// sender of the email
-    #[prost(string, tag = "2")]
+    #[prost(string, tag = "3")]
     pub sender: ::prost::alloc::string::String,
     /// recipients of the email
-    #[prost(string, repeated, tag = "3")]
+    #[prost(string, repeated, tag = "4")]
     pub recipients: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// body of the email
-    #[prost(string, tag = "4")]
+    #[prost(string, tag = "5")]
     pub body: ::prost::alloc::string::String,
 }
 /// sms message to be send
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SmsMessage {
-    /// sender of the sms
+    /// unique id of the message
     #[prost(string, tag = "1")]
+    pub message_id: ::prost::alloc::string::String,
+    /// sender of the sms
+    #[prost(string, tag = "2")]
     pub sender: ::prost::alloc::string::String,
     /// recipients of the sms
-    #[prost(string, repeated, tag = "2")]
+    #[prost(string, repeated, tag = "3")]
     pub recipients: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// body of the sms
-    #[prost(string, tag = "3")]
+    #[prost(string, tag = "4")]
     pub body: ::prost::alloc::string::String,
 }
 /// in app message to be send
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InAppMessage {
-    /// device id of the recipient
+    /// unique id of the message
     #[prost(string, tag = "1")]
+    pub message_id: ::prost::alloc::string::String,
+    /// device id of the recipient
+    #[prost(string, tag = "2")]
     pub device_id: ::prost::alloc::string::String,
     /// title of the message
-    #[prost(string, tag = "2")]
+    #[prost(string, tag = "3")]
     pub title: ::prost::alloc::string::String,
     /// body of the message
-    #[prost(string, tag = "3")]
+    #[prost(string, tag = "4")]
     pub body: ::prost::alloc::string::String,
 }
 /// request to send a message
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SendRequest {
-    /// unique id of the message
-    #[prost(string, tag = "1")]
-    pub message_id: ::prost::alloc::string::String,
     /// type of the message
     #[prost(oneof = "send_request::Msg", tags = "2, 3, 4")]
     pub msg: ::core::option::Option<send_request::Msg>,

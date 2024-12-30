@@ -6,38 +6,43 @@ import "google/protobuf/timestamp.proto";
 
 // email message to be send
 message  EmailMessage{
+  // unique id of the message
+  string message_id = 1;
   // subject of the email
-  string subject = 1;
+  string subject = 2;
   // sender of the email
-  string sender = 2;
+  string sender = 3;
   // recipients of the email
-  repeated string recipients = 3;
+  repeated string recipients = 4;
   // body of the email
-  string body = 4;
+  string body = 5;
 }
 // sms message to be send
 message SmsMessage{
+  // unique id of the message
+  string message_id = 1;
   // sender of the sms
-  string sender = 1;
+  string sender = 2;
   // recipients of the sms
-  repeated string recipients = 2;
+  repeated string recipients = 3;
   // body of the sms
-  string body = 3;
+  string body = 4;
 
 }
 // in app message to be send
 message InAppMessage{
+  // unique id of the message
+  string message_id = 1;
   // device id of the recipient
-  string device_id = 1;
+  string device_id = 2;
   // title of the message
-  string title = 2;
+  string title = 3;
   // body of the message
-  string body = 3;
+  string body = 4;
 }
 // request to send a message
 message SendRequest{
-  // unique id of the message
-  string message_id = 1;
+
   // type of the message
   oneof msg {
     // email message

@@ -7,6 +7,7 @@ resolver = "2"
 
 [workspace.dependencies]
 tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
+tokio-stream = "0.1.16"
 anyhow = "1.0.91"
 prost = "0.13.3"
 prost-types = "0.13.3"
