@@ -61,9 +61,6 @@ impl Content {
     /// # 参数
     /// * `id` - 要生成的 Content 的唯一标识符
     ///
-    /// # 返回值
-    /// 返回一个新的 Content 实例
-    ///
     /// # 功能
     /// 此方法使用随机生成的数据创建一个新的 Content 实例，包括名称、描述、发布者等信息。
     pub fn materialize(id: u32) -> Self {
